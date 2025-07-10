@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8" />
-  <title>Квиз-эксель: всегда видны все ответы и скролл</title>
+  <title>Квіз-екcель</title>
   <style>
     body {
       background: linear-gradient(135deg, #1e2a2f 60%, #204040 100%);
@@ -22,6 +22,42 @@
       width: 100%;
       max-width: 98vw;
     }
+    #main.hide { display: none; }
+    #pw-modal-bg {
+      position: fixed; left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(30,35,40,0.83); z-index: 99; display: flex; align-items: center; justify-content: center;
+    }
+    #pw-modal {
+      background: #fff; color: #222; border-radius: 16px; box-shadow: 0 8px 38px #0019; min-width: 340px; max-width: 92vw;
+      padding: 30px 26px 24px 26px; display: flex; flex-direction: column; align-items: center;
+    }
+    #pw-modal h2 { margin: 0 0 18px 0; font-size: 1.21em; }
+    #pw-modal label { margin-bottom: 16px; display: block; font-size: 1em; }
+    #pw-modal input[type=password], #pw-modal input[type=text] {
+      width: 220px; font-size: 1.11em; padding: 8px 38px 8px 10px; border-radius: 7px; border: 1.6px solid #ddd;
+      margin-bottom: 15px; outline: none; transition: border .17s;
+    }
+    #pw-modal input[type=password]:focus, #pw-modal input[type=text]:focus { border: 1.6px solid #2cb17e; }
+    #pw-modal .pw-btns { display: flex; gap: 16px; margin-top: 6px; }
+    #pw-modal button {
+      padding: 7px 32px; border-radius: 8px; font-size: 1.07em; background: #2cb17e; color: #fff;
+      border: none; cursor: pointer; font-weight: 600; transition: background .14s;
+    }
+    #pw-modal button:hover { background: #229167; }
+    #pw-modal .cancel-btn {
+      background: #ddd; color: #222;
+    }
+    #pw-modal .cancel-btn:hover { background: #bbb; }
+    #pw-modal .pw-error {
+      color: #d32f2f; font-size: 0.99em; margin-bottom: 8px; text-align: center; min-height: 22px;
+    }
+    #pw-eye-btn {
+      position: absolute;
+      right: 35px; top: 44px;
+      border: none; background: none; cursor: pointer; padding: 0; z-index: 3;
+    }
+    #pw-eye-btn svg { width: 24px; height: 24px; fill: #8bc34a; }
+    #pw-eye-btn.hide svg { fill: #bbb; }
     .quiz-box {
       background: #f7fafc;
       color: #233;
@@ -58,7 +94,6 @@
       height: 350px;
       transition: box-shadow .23s;
     }
-    /* Ресайзеры: прямоугольные */
     .resize-rect {
       position: absolute;
       background: #ffe57f66;
@@ -146,232 +181,346 @@
   </style>
 </head>
 <body>
-  <div id="main">
-    <div class="quiz-box" id="quiz-area">
-      <div id="question"></div>
-      <div id="choices"></div>
-    </div>
-    <div class="table-wrap" id="tableWrap">
-      <!-- Ресайзеры-прямоугольники -->
-      <div class="resize-rect r" id="resizeR"></div>
-      <div class="resize-rect b" id="resizeB"></div>
-      <div class="resize-rect br" id="resizeBR"></div>
-      <!-- Кнопки + и - -->
-      <div class="table-controls">
-        <div class="mini-btn" onclick="resizeTable(-1)" title="Уменьшить контент">−</div>
-        <div class="mini-btn" onclick="resizeTable(1)"  title="Увеличить контент">+</div>
-      </div>
-      <div id="excel-table"></div>
-    </div>
-    <div id="three-counter"></div>
-  </div>
-  <script>
-    const questions = [
-      "Почему важно сортировать мусор?",
-      "Зачем экономить воду дома?",
-      "Что такое повторное использование вещей?",
-      "Как уменьшить загрязнение воздуха?",
-      "Почему нужно сажать деревья?",
-      "В чем польза общественного транспорта для экологии?",
-      "Почему важно экономить электричество?",
-      "Как пластиковые отходы вредят природе?",
-      "Что такое органические продукты?",
-      "Как уменьшить свой углеродный след?",
-      "Что значит устойчивое потребление?",
-      "Почему важно поддерживать биоразнообразие?",
-      "Как можно сократить потребление пластика?",
-      "Зачем использовать многоразовые сумки?",
-      "Что такое компостирование?",
-      "Как защищать редкие виды животных?",
-      "Почему важно сохранять леса?",
-      "Что такое возобновляемая энергия?",
-      "Как влияет выброс CO2 на климат?",
-      "Зачем участвовать в экологических акциях?"
-    ];
-    const numRows = questions.length;
-    let answers = Array(numRows).fill(null);
-    let currentQuestion = 0;
-    let tableScale = 1;
-    const minScale = 0.1, maxScale = 1.5;
-    let lastN = 1;
+<script>
+  // --- Паролі: кожен діє 1 хвилину з моменту першого застосування ---
+  const PASSWORDS = [
+    { key: 'pw1', value: 'parol2024' },
+    { key: 'pw2', value: 'kviz2024' },
+    { key: 'pw3', value: 'ekolog2024' }
+  ];
+  const VALID_MS = 60 * 1000; // 1 хвилина
 
-    function typeWriter(text, el, delay = 12, cb) {
-      el.innerHTML = '';
-      let i = 0;
-      el.classList.add('typewriter');
-      function typing() {
-        if (i < text.length) {
-          el.innerHTML += text[i] === '\n' ? '<br>' : text[i];
-          i++;
-          setTimeout(typing, delay);
+  // Очищаем просроченные пароли при загрузке страницы
+  function clearExpiredPasswords() {
+    let access = localStorage.getItem('quiz_access');
+    if (!access) return;
+    access = JSON.parse(access);
+    let now = Date.now();
+    let changed = false;
+    for (let pass of PASSWORDS) {
+      let ts = access[pass.key];
+      if (ts && now - ts > VALID_MS) {
+        delete access[pass.key];
+        changed = true;
+      }
+    }
+    if (changed) localStorage.setItem('quiz_access', JSON.stringify(access));
+  }
+
+  function showPwModal() {
+    return new Promise((resolve, reject) => {
+      const modalBg = document.createElement('div');
+      modalBg.id = 'pw-modal-bg';
+      modalBg.innerHTML = `
+        <form id="pw-modal" autocomplete="off" style="position:relative">
+          <h2>Введіть пароль для входу на сайт</h2>
+          <div class="pw-error" id="pw-error"></div>
+          <label style="position:relative; display:block;">
+            <input id="pw-input" type="password" autocomplete="current-password" maxlength="40" placeholder="Пароль" required />
+            <button id="pw-eye-btn" tabindex="-1" type="button" class="hide" aria-label="Показати пароль">
+              <svg viewBox="0 0 24 24"><path d="M12 4.5C6.477 4.5 1.708 8.096.173 13.016c-.081.264-.081.551 0 .815C1.708 19.904 6.477 23.5 12 23.5s10.292-3.596 11.827-8.516c.081-.264.081-.551 0-.815C22.292 8.096 17.523 4.5 12 4.5zm0 16c-4.6 0-8.478-2.905-9.876-7C3.522 9.405 7.4 6.5 12 6.5s8.478 2.905 9.876 7c-1.398 4.095-5.276 7-9.876 7zm0-12a5 5 0 100 10 5 5 0 000-10zm0 8a3 3 0 110-6 3 3 0 010 6z"/></svg>
+            </button>
+          </label>
+          <div class="pw-btns">
+            <button type="submit">OK</button>
+            <button type="button" class="cancel-btn">Відміна</button>
+          </div>
+        </form>`;
+      document.body.appendChild(modalBg);
+
+      const input = document.getElementById('pw-input');
+      const error = document.getElementById('pw-error');
+      const eyeBtn = document.getElementById('pw-eye-btn');
+      let pwVisible = false;
+      eyeBtn.onclick = (e) => {
+        e.preventDefault();
+        pwVisible = !pwVisible;
+        input.type = pwVisible ? 'text' : 'password';
+        eyeBtn.classList.toggle('hide', !pwVisible);
+      };
+
+      input.focus();
+
+      modalBg.querySelector('form').onsubmit = (e) => {
+        e.preventDefault();
+        const pass = input.value.trim();
+        let matched = PASSWORDS.find(p => p.value === pass);
+        if (matched) {
+          // Ставимо таймстемп тільки для цього пароля
+          let obj = localStorage.getItem('quiz_access');
+          obj = obj ? JSON.parse(obj) : {};
+          if (!obj[matched.key]) obj[matched.key] = Date.now();
+          localStorage.setItem('quiz_access', JSON.stringify(obj));
+          document.body.removeChild(modalBg);
+          resolve(matched.key);
         } else {
-          el.classList.remove('typewriter');
-          if (cb) cb();
+          error.textContent = 'Невірний пароль!';
+        }
+      };
+      modalBg.querySelector('.cancel-btn').onclick = () => {
+        document.body.removeChild(modalBg);
+        reject();
+      };
+    });
+  }
+
+  async function passwordCheck() {
+    clearExpiredPasswords();
+    let access = localStorage.getItem('quiz_access');
+    let usedKey = null, ok = false;
+    if (access) {
+      access = JSON.parse(access);
+      let now = Date.now();
+      for (let pass of PASSWORDS) {
+        let ts = access[pass.key];
+        if (ts && now - ts < VALID_MS) {
+          ok = true;
+          usedKey = pass.key;
+          break;
         }
       }
-      typing();
     }
-
-    function showQuestion() {
-      if (currentQuestion < questions.length) {
-        document.getElementById('question').innerText = `Вопрос ${currentQuestion+1} из 20: ${questions[currentQuestion]}`;
-        document.getElementById('choices').style.opacity = 1;
-        document.getElementById('choices').innerHTML = `
-          <button class="btn red"    onclick="submitAnswer(0)">0</button>
-          <button class="btn yellow" onclick="submitAnswer(1)">1</button>
-          <button class="btn green"  onclick="submitAnswer(3)">3</button>
-        `;
-      } else {
-        document.getElementById('quiz-area').style.display = 'none';
+    if (!ok) {
+      try {
+        usedKey = await showPwModal();
+        // Сразу очищаем просроченные после ввода!
+        clearExpiredPasswords();
+      } catch {
+        document.body.innerHTML = "";
+        throw "Canceled";
       }
-      updateTable(true);
     }
+    document.getElementById('main').classList.remove('hide');
+  }
+</script>
+<div id="main" class="hide">
+  <div class="quiz-box" id="quiz-area">
+    <div id="question"></div>
+    <div id="choices"></div>
+  </div>
+  <div class="table-wrap" id="tableWrap">
+    <div class="resize-rect r" id="resizeR"></div>
+    <div class="resize-rect b" id="resizeB"></div>
+    <div class="resize-rect br" id="resizeBR"></div>
+    <div class="table-controls">
+      <div class="mini-btn" onclick="resizeTable(-1)" title="Зменшити контент">−</div>
+      <div class="mini-btn" onclick="resizeTable(1)"  title="Збільшити контент">+</div>
+    </div>
+    <div id="excel-table"></div>
+  </div>
+  <div id="three-counter"></div>
+</div>
+<script>
+passwordCheck().then(startQuiz);
 
-    function submitAnswer(val) {
-      document.getElementById('choices').style.opacity = 0;
-      answers[currentQuestion] = val;
+function startQuiz() {
+  // ---- ВЕСЬ КОД КВІЗА ----
+  const questions = [
+    "Чому важливо сортувати сміття?",
+    "Навіщо економити воду вдома?",
+    "Що таке повторне використання речей?",
+    "Як зменшити забруднення повітря?",
+    "Чому треба саджати дерева?",
+    "Яка користь громадського транспорту для екології?",
+    "Чому важливо економити електроенергію?",
+    "Як пластикові відходи шкодять природі?",
+    "Що таке органічні продукти?",
+    "Як зменшити свій вуглецевий слід?",
+    "Що означає стале споживання?",
+    "Чому важливо підтримувати біорізноманіття?",
+    "Як можна скоротити споживання пластику?",
+    "Навіщо використовувати багаторазові сумки?",
+    "Що таке компостування?",
+    "Як захищати рідкісні види тварин?",
+    "Чому важливо зберігати ліси?",
+    "Що таке відновлювана енергія?",
+    "Як впливає викид CO2 на клімат?",
+    "Навіщо брати участь в екологічних акціях?"
+  ];
+  const numRows = questions.length;
+  let answers = Array(numRows).fill(null);
+  let currentQuestion = 0;
+  let tableScale = 1;
+  const minScale = 0.1, maxScale = 1.5;
+  let lastN = 1;
+
+  function typeWriter(text, el, delay = 12, cb) {
+    el.innerHTML = '';
+    let i = 0;
+    el.classList.add('typewriter');
+    function typing() {
+      if (i < text.length) {
+        el.innerHTML += text[i] === '\n' ? '<br>' : text[i];
+        i++;
+        setTimeout(typing, delay);
+      } else {
+        el.classList.remove('typewriter');
+        if (cb) cb();
+      }
+    }
+    typing();
+  }
+
+  window.showQuestion = function() {
+    if (currentQuestion < questions.length) {
+      document.getElementById('question').innerText = `Питання ${currentQuestion+1} з 20: ${questions[currentQuestion]}`;
+      document.getElementById('choices').style.opacity = 1;
+      document.getElementById('choices').innerHTML = `
+        <button class="btn red"    onclick="submitAnswer(0)">0</button>
+        <button class="btn yellow" onclick="submitAnswer(1)">1</button>
+        <button class="btn green"  onclick="submitAnswer(3)">3</button>
+      `;
+    } else {
+      document.getElementById('quiz-area').style.display = 'none';
+    }
+    updateTable(true);
+  }
+
+  window.submitAnswer = function(val) {
+    document.getElementById('choices').style.opacity = 0;
+    answers[currentQuestion] = val;
+    setTimeout(() => {
+      currentQuestion++;
+      showQuestion();
+      updateCounter();
+    }, 180);
+  }
+
+  function getSum() {
+    return answers.reduce((a, b) => a + (b !== null ? b : 0), 0);
+  }
+  function getSumColor(sum) {
+    if (sum >= 17 && sum < 18) return 'color-orange';
+    if (sum >= 18 && sum < 25) return 'color-yellow';
+    if (sum >= 25 && sum <= 30) return 'color-green';
+    return 'empty';
+  }
+  function getSumColumn(sum) {
+    if (sum >= 17 && sum < 18) return 0; // Orange
+    if (sum >= 18 && sum < 25) return 1; // Yellow
+    if (sum >= 25 && sum <= 30) return 2; // Green
+    return -1;
+  }
+
+  window.updateTable = function(withAnimation = false) {
+    const N = Math.max(1, currentQuestion);
+    let thFont = N > 9 ? "0.92em" : (N > 6 ? "0.99em" : "1.06em");
+    let html = `<div class="scalable-table" id="scalableTable" style="font-size: ${tableScale}em;">`;
+    html += `<table><tr><th class="row-num"></th>`;
+    for (let q = 0; q < N; q++) {
+      let anim = (withAnimation && N > lastN && q === N-1) ? "new-cell" : "";
+      html += `<th class="${anim}" style="font-size:${thFont}"><span id="header-q-${q}"></span></th>`;
+    }
+    html += `<th class="sum-col">Сума</th>`;
+    html += `<th class="color-sect"><div class="color-orange">17–18</div></th>`;
+    html += `<th class="color-sect"><div class="color-yellow">18–25</div></th>`;
+    html += `<th class="color-sect"><div class="color-green">25–30</div></th>`;
+    html += '</tr>';
+    // Сумма (всегда сверху)
+    let sum = getSum();
+    let colorClass = getSumColor(sum);
+    let sumCol = getSumColumn(sum);
+    html += '<tr class="sum-row">';
+    html += '<td></td>';
+    for (let c = 0; c < N; c++) html += '<td></td>';
+    html += `<td class="sum-live">${sum}</td>`;
+    for (let i = 0; i < 3; i++) {
+      html += (i === sumCol && currentQuestion >= numRows)
+        ? `<td class="sum-final ${colorClass}">${sum}</td>`
+        : `<td class="sum-final empty"></td>`;
+    }
+    html += '</tr>';
+    // Строки-ответы: только для уже отвеченных!
+    for (let r = 0; r < N; r++) {
+      let rowAnim = (withAnimation && N > lastN && r === N-1) ? "new-cell" : "";
+      html += `<tr><td class="row-num ${rowAnim}">${r+1}</td>`;
+      for (let c = 0; c < N; c++) {
+        let anim = (withAnimation && N > lastN && (c === N-1 || r === N-1)) ? "new-cell" : "";
+        if (r === c) {
+          html += (answers[r] === null)
+            ? `<td class="dark-cell ${anim}"></td>`
+            : `<td class="${anim}">${answers[r]}</td>`;
+        } else {
+          html += `<td class="dark-cell ${anim}"></td>`;
+        }
+      }
+      html += `<td class="sum-col"></td><td></td><td></td><td></td></tr>`;
+    }
+    html += '</table></div>';
+    document.getElementById('excel-table').innerHTML = html;
+    if (withAnimation && N > lastN) {
       setTimeout(() => {
-        currentQuestion++;
-        showQuestion();
-        updateCounter();
-      }, 180);
-    }
-
-    function getSum() {
-      return answers.reduce((a, b) => a + (b !== null ? b : 0), 0);
-    }
-    function getSumColor(sum) {
-      if (sum >= 17 && sum < 18) return 'color-orange';
-      if (sum >= 18 && sum < 25) return 'color-yellow';
-      if (sum >= 25 && sum <= 30) return 'color-green';
-      return 'empty';
-    }
-    function getSumColumn(sum) {
-      if (sum >= 17 && sum < 18) return 0; // Orange
-      if (sum >= 18 && sum < 25) return 1; // Yellow
-      if (sum >= 25 && sum <= 30) return 2; // Green
-      return -1;
-    }
-
-    // ВАЖНО: отображаем все вопросы и все ответы, но fade-in для новых!
-    function updateTable(withAnimation = false) {
-      const N = Math.max(1, currentQuestion);
-      let thFont = N > 9 ? "0.92em" : (N > 6 ? "0.99em" : "1.06em");
-      let html = `<div class="scalable-table" id="scalableTable" style="font-size: ${tableScale}em;">`;
-      html += `<table><tr><th class="row-num"></th>`;
-      for (let q = 0; q < N; q++) {
-        let anim = (withAnimation && N > lastN && q === N-1) ? "new-cell" : "";
-        html += `<th class="${anim}" style="font-size:${thFont}"><span id="header-q-${q}"></span></th>`;
-      }
-      html += `<th class="sum-col">Сумма</th>`;
-      html += `<th class="color-sect"><div class="color-orange">17–18</div></th>`;
-      html += `<th class="color-sect"><div class="color-yellow">18–25</div></th>`;
-      html += `<th class="color-sect"><div class="color-green">25–30</div></th>`;
-      html += '</tr>';
-      // Сумма (всегда сверху)
-      let sum = getSum();
-      let colorClass = getSumColor(sum);
-      let sumCol = getSumColumn(sum);
-      html += '<tr class="sum-row">';
-      html += '<td></td>';
-      for (let c = 0; c < N; c++) html += '<td></td>';
-      html += `<td class="sum-live">${sum}</td>`;
-      for (let i = 0; i < 3; i++) {
-        html += (i === sumCol && currentQuestion >= numRows)
-          ? `<td class="sum-final ${colorClass}">${sum}</td>`
-          : `<td class="sum-final empty"></td>`;
-      }
-      html += '</tr>';
-      // Строки-ответы: каждая строка только для уже отвеченных вопросов!
-      for (let r = 0; r < N; r++) {
-        let rowAnim = (withAnimation && N > lastN && r === N-1) ? "new-cell" : "";
-        html += `<tr><td class="row-num ${rowAnim}">${r+1}</td>`;
-        for (let c = 0; c < N; c++) {
-          let anim = (withAnimation && N > lastN && (c === N-1 || r === N-1)) ? "new-cell" : "";
-          if (r === c) {
-            html += (answers[r] === null)
-              ? `<td class="dark-cell ${anim}"></td>`
-              : `<td class="${anim}">${answers[r]}</td>`;
-          } else {
-            html += `<td class="dark-cell ${anim}"></td>`;
-          }
+        let cell = document.getElementById(`header-q-${N-1}`);
+        if (cell && cell.innerHTML.trim() === '') {
+          typeWriter(questions[N-1], cell, 12);
         }
-        html += `<td class="sum-col"></td><td></td><td></td><td></td></tr>`;
-      }
-      html += '</table></div>';
-      document.getElementById('excel-table').innerHTML = html;
-      if (withAnimation && N > lastN) {
-        setTimeout(() => {
-          let cell = document.getElementById(`header-q-${N-1}`);
-          if (cell && cell.innerHTML.trim() === '') {
-            typeWriter(questions[N-1], cell, 12);
-          }
-        }, 90);
-      } else {
-        for (let i = 0; i < N; i++) {
-          let cell = document.getElementById(`header-q-${i}`);
-          if (cell) cell.innerHTML = questions[i];
-        }
-      }
-      lastN = N;
-    }
-
-    function updateCounter() {
-      let count3 = answers.filter(x => x === 3).length;
-      document.getElementById('three-counter').innerHTML =
-        `<div class="counter-box">Всего “3” выбрано: ${count3}</div>`;
-    }
-
-    // Кнопки +/−: меняют масштаб контента (шрифт/отступы)
-    function resizeTable(delta) {
-      tableScale += delta * 0.09;
-      if (tableScale < minScale) tableScale = minScale;
-      if (tableScale > maxScale) tableScale = maxScale;
-      updateTable(false);
-    }
-
-    // Ресайзеры области
-    const tableWrap = document.getElementById('tableWrap');
-    let isResizing = false, resizeDir = "", startX = 0, startY = 0, startW = 0, startH = 0;
-
-    function startResize(e, dir) {
-      isResizing = true;
-      resizeDir = dir;
-      startX = e.clientX; startY = e.clientY;
-      startW = tableWrap.offsetWidth;
-      startH = tableWrap.offsetHeight;
-      document.body.style.userSelect = "none";
-      e.target.classList.add('active');
-    }
-    function doResize(e) {
-      if (!isResizing) return;
-      let dx = e.clientX - startX;
-      let dy = e.clientY - startY;
-      if (resizeDir === "both") {
-        tableWrap.style.width = Math.max(140, startW + dx) + "px";
-        tableWrap.style.height = Math.max(60, startH + dy) + "px";
-      }
-      if (resizeDir === "horiz") {
-        tableWrap.style.width = Math.max(140, startW + dx) + "px";
-      }
-      if (resizeDir === "vert") {
-        tableWrap.style.height = Math.max(60, startH + dy) + "px";
+      }, 90);
+    } else {
+      for (let i = 0; i < N; i++) {
+        let cell = document.getElementById(`header-q-${i}`);
+        if (cell) cell.innerHTML = questions[i];
       }
     }
-    function stopResize(e) {
-      isResizing = false;
-      document.body.style.userSelect = "";
-      document.querySelectorAll('.resize-rect').forEach(el=>el.classList.remove('active'));
-    }
-    document.getElementById('resizeBR').addEventListener("mousedown", e => startResize(e, "both"));
-    document.getElementById('resizeR').addEventListener("mousedown", e => startResize(e, "horiz"));
-    document.getElementById('resizeB').addEventListener("mousedown", e => startResize(e, "vert"));
-    window.addEventListener("mousemove", doResize);
-    window.addEventListener("mouseup", stopResize);
+    lastN = N;
+  }
 
-    // Показываем первый вопрос
-    showQuestion();
-    updateCounter();
-  </script>
+  window.updateCounter = function() {
+    let count3 = answers.filter(x => x === 3).length;
+    document.getElementById('three-counter').innerHTML =
+      `<div class="counter-box">Всього “3” вибрано: ${count3}</div>`;
+  }
+
+  // Кнопки +/−: меняют масштаб
+  window.resizeTable = function(delta) {
+    tableScale += delta * 0.09;
+    if (tableScale < minScale) tableScale = minScale;
+    if (tableScale > maxScale) tableScale = maxScale;
+    updateTable(false);
+  };
+
+  // Ресайзеры области
+  const tableWrap = document.getElementById('tableWrap');
+  let isResizing = false, resizeDir = "", startX = 0, startY = 0, startW = 0, startH = 0;
+
+  function startResize(e, dir) {
+    isResizing = true;
+    resizeDir = dir;
+    startX = e.clientX; startY = e.clientY;
+    startW = tableWrap.offsetWidth;
+    startH = tableWrap.offsetHeight;
+    document.body.style.userSelect = "none";
+    e.target.classList.add('active');
+  }
+  function doResize(e) {
+    if (!isResizing) return;
+    let dx = e.clientX - startX;
+    let dy = e.clientY - startY;
+    if (resizeDir === "both") {
+      tableWrap.style.width = Math.max(140, startW + dx) + "px";
+      tableWrap.style.height = Math.max(60, startH + dy) + "px";
+    }
+    if (resizeDir === "horiz") {
+      tableWrap.style.width = Math.max(140, startW + dx) + "px";
+    }
+    if (resizeDir === "vert") {
+      tableWrap.style.height = Math.max(60, startH + dy) + "px";
+    }
+  }
+  function stopResize(e) {
+    isResizing = false;
+    document.body.style.userSelect = "";
+    document.querySelectorAll('.resize-rect').forEach(el=>el.classList.remove('active'));
+  }
+  document.getElementById('resizeBR').addEventListener("mousedown", e => startResize(e, "both"));
+  document.getElementById('resizeR').addEventListener("mousedown", e => startResize(e, "horiz"));
+  document.getElementById('resizeB').addEventListener("mousedown", e => startResize(e, "vert"));
+  window.addEventListener("mousemove", doResize);
+  window.addEventListener("mouseup", stopResize);
+
+  // Запуск
+  showQuestion();
+  updateCounter();
+}
+</script>
 </body>
 </html>

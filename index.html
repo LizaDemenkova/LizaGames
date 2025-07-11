@@ -14,6 +14,7 @@
       flex-direction: column;
       align-items: center;
     }
+    #main.hide { display: none; }
     #main {
       margin-top: 60px;
       display: flex;
@@ -22,42 +23,6 @@
       width: 100%;
       max-width: 98vw;
     }
-    #main.hide { display: none; }
-    #pw-modal-bg {
-      position: fixed; left: 0; top: 0; width: 100vw; height: 100vh;
-      background: rgba(30,35,40,0.83); z-index: 99; display: flex; align-items: center; justify-content: center;
-    }
-    #pw-modal {
-      background: #fff; color: #222; border-radius: 16px; box-shadow: 0 8px 38px #0019; min-width: 340px; max-width: 92vw;
-      padding: 30px 26px 24px 26px; display: flex; flex-direction: column; align-items: center;
-    }
-    #pw-modal h2 { margin: 0 0 18px 0; font-size: 1.21em; }
-    #pw-modal label { margin-bottom: 16px; display: block; font-size: 1em; }
-    #pw-modal input[type=password], #pw-modal input[type=text] {
-      width: 220px; font-size: 1.11em; padding: 8px 38px 8px 10px; border-radius: 7px; border: 1.6px solid #ddd;
-      margin-bottom: 15px; outline: none; transition: border .17s;
-    }
-    #pw-modal input[type=password]:focus, #pw-modal input[type=text]:focus { border: 1.6px solid #2cb17e; }
-    #pw-modal .pw-btns { display: flex; gap: 16px; margin-top: 6px; }
-    #pw-modal button {
-      padding: 7px 32px; border-radius: 8px; font-size: 1.07em; background: #2cb17e; color: #fff;
-      border: none; cursor: pointer; font-weight: 600; transition: background .14s;
-    }
-    #pw-modal button:hover { background: #229167; }
-    #pw-modal .cancel-btn {
-      background: #ddd; color: #222;
-    }
-    #pw-modal .cancel-btn:hover { background: #bbb; }
-    #pw-modal .pw-error {
-      color: #d32f2f; font-size: 0.99em; margin-bottom: 8px; text-align: center; min-height: 22px;
-    }
-    #pw-eye-btn {
-      position: absolute;
-      right: 35px; top: 44px;
-      border: none; background: none; cursor: pointer; padding: 0; z-index: 3;
-    }
-    #pw-eye-btn svg { width: 24px; height: 24px; fill: #8bc34a; }
-    #pw-eye-btn.hide svg { fill: #bbb; }
     .quiz-box {
       background: #f7fafc;
       color: #233;
@@ -172,6 +137,78 @@
     @keyframes pop { 0% {transform: scale(1.11);} 100% {transform: scale(1);}
     }
     .counter-box { margin: 10px auto 34px auto; padding: 9px 18px; background: #36fa99; color: #062c17; border-radius: 16px; display: inline-block; font-weight: 700; font-size: 1.09em; box-shadow: 0 2px 10px #0001; letter-spacing: .03em; transition: background .18s; border: 2.5px solid #77ffc3; text-shadow: 0 1px 0 #fff, 0 2px 3px #69fcaf66;}
+    /* --- Окно пароля --- */
+    #pw-modal-bg {
+      position: fixed; z-index: 9999; inset: 0; background: #222e 0.8;
+      display: flex; align-items: center; justify-content: center;
+      animation: fadeInBg .25s;
+    }
+    @keyframes fadeInBg { from { opacity: 0; } to { opacity: 1; } }
+    #pw-modal {
+      background: #f7fafc;
+      color: #122;
+      border-radius: 32px;
+      padding: 32px 36px 22px 36px;
+      min-width: 340px; max-width: 96vw;
+      box-shadow: 0 2px 40px #0007;
+      display: flex; flex-direction: column; align-items: stretch;
+      margin-top: -38px;
+      animation: fadeInUp .3s;
+    }
+    @keyframes fadeInUp { from { transform: translateY(90px); opacity:0; } to { transform: none; opacity: 1; } }
+    #pw-modal h2 { font-size: 2rem; font-weight: bold; margin: 0 0 14px 0; text-align: left;}
+    #pw-modal label { margin-bottom: 14px; }
+    #pw-modal input[type="password"], #pw-modal input[type="text"] {
+      width: 100%; font-size: 1.19em; border-radius: 10px; border: 1.5px solid #bbd; padding: 9px 36px 9px 14px; margin-top: 10px; margin-bottom: 2px;
+      background: #fcfdff;
+      color: #183;
+      box-shadow: 0 2px 10px #2261;
+      letter-spacing: 0.04em;
+      outline: none; transition: border .2s;
+    }
+    #pw-modal .pw-btns { display: flex; gap: 18px; margin-top: 19px; }
+    #pw-modal button[type="submit"], #pw-modal .cancel-btn {
+      background: #1960d8;
+      color: #fff;
+      border: none;
+      border-radius: 22px;
+      font-size: 1.13em;
+      font-weight: bold;
+      min-width: 110px;
+      min-height: 56px;
+      margin: 0;
+      margin-bottom: 0;
+      margin-top: 0;
+      box-shadow: 0 2px 16px #1b6cf344;
+      cursor: pointer;
+      transition: background .17s, color .13s;
+      outline: none;
+    }
+    #pw-modal .cancel-btn {
+      background: #e9f0fe;
+      color: #133;
+    }
+    #pw-modal .pw-error {
+      min-height: 18px;
+      color: #db0e1f;
+      font-weight: 600;
+      font-size: 1.09em;
+      margin-bottom: 7px;
+      margin-top: 2px;
+      text-align: left;
+    }
+    #pw-eye-btn {
+      position: absolute; right: 5px; top: 15px; width: 33px; height: 33px; background: none; border: none; outline: none; cursor: pointer;
+      opacity: .7; transition: opacity .15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #pw-eye-btn svg {
+      width: 23px; height: 23px; fill: #11497a;
+    }
+    #pw-eye-btn.hide { opacity: .3; }
+    @media (max-width: 480px) {
+      #pw-modal { min-width: 92vw; padding: 24px 2vw 17px 2vw; }
+    }
     @media (max-width: 650px) {
       .table-wrap { min-width: 100vw; max-width: 100vw; }
       .scalable-table { min-width: 140px; }
@@ -182,117 +219,139 @@
 </head>
 <body>
 <script>
-  // --- Паролі: кожен діє 1 хвилину з моменту першого застосування ---
-  const PASSWORDS = [
-    { key: 'pw1', value: 'parol2024' },
-    { key: 'pw2', value: 'kviz2024' },
-    { key: 'pw3', value: 'ekolog2024' }
-  ];
-  const VALID_MS = 60 * 1000; // 1 хвилина
+const PASSWORDS = [
+  { key: 'alh', value: 'razoor433' },
+  { key: 'bav', value: 'bravo56' },
+  { key: 'chrli', value: 'charle789' }
+];
+const VALID_MS = 60 * 1000; // 1 хвилина
 
-  // Очищаем просроченные пароли при загрузке страницы
-  function clearExpiredPasswords() {
-    let access = localStorage.getItem('quiz_access');
-    if (!access) return;
-    access = JSON.parse(access);
-    let now = Date.now();
-    let changed = false;
-    for (let pass of PASSWORDS) {
-      let ts = access[pass.key];
-      if (ts && now - ts > VALID_MS) {
-        delete access[pass.key];
-        changed = true;
-      }
+function isExpired(ts) {
+  return Date.now() - ts > VALID_MS;
+}
+
+function clearExpiredPasswords() {
+  let access = localStorage.getItem('quiz_access');
+  if (!access) return;
+  access = JSON.parse(access);
+  let changed = false;
+  for (let pass of PASSWORDS) {
+    let ts = access[pass.key];
+    if (ts && isExpired(ts)) {
+      access[pass.key+'_expired'] = true; // метка просроченного
+      delete access[pass.key];
+      changed = true;
     }
-    if (changed) localStorage.setItem('quiz_access', JSON.stringify(access));
   }
+  if (changed) localStorage.setItem('quiz_access', JSON.stringify(access));
+}
 
-  function showPwModal() {
-    return new Promise((resolve, reject) => {
-      const modalBg = document.createElement('div');
-      modalBg.id = 'pw-modal-bg';
-      modalBg.innerHTML = `
-        <form id="pw-modal" autocomplete="off" style="position:relative">
-          <h2>Введіть пароль для входу на сайт</h2>
-          <div class="pw-error" id="pw-error"></div>
-          <label style="position:relative; display:block;">
-            <input id="pw-input" type="password" autocomplete="current-password" maxlength="40" placeholder="Пароль" required />
-            <button id="pw-eye-btn" tabindex="-1" type="button" class="hide" aria-label="Показати пароль">
-              <svg viewBox="0 0 24 24"><path d="M12 4.5C6.477 4.5 1.708 8.096.173 13.016c-.081.264-.081.551 0 .815C1.708 19.904 6.477 23.5 12 23.5s10.292-3.596 11.827-8.516c.081-.264.081-.551 0-.815C22.292 8.096 17.523 4.5 12 4.5zm0 16c-4.6 0-8.478-2.905-9.876-7C3.522 9.405 7.4 6.5 12 6.5s8.478 2.905 9.876 7c-1.398 4.095-5.276 7-9.876 7zm0-12a5 5 0 100 10 5 5 0 000-10zm0 8a3 3 0 110-6 3 3 0 010 6z"/></svg>
-            </button>
-          </label>
-          <div class="pw-btns">
-            <button type="submit">OK</button>
-            <button type="button" class="cancel-btn">Відміна</button>
-          </div>
-        </form>`;
-      document.body.appendChild(modalBg);
+function showPwModal() {
+  return new Promise((resolve, reject) => {
+    const modalBg = document.createElement('div');
+    modalBg.id = 'pw-modal-bg';
+    modalBg.innerHTML = `
+      <form id="pw-modal" autocomplete="off" style="position:relative">
+        <h2>Введіть пароль для входу на сайт</h2>
+        <div class="pw-error" id="pw-error"></div>
+        <label style="position:relative; display:block;">
+          <input id="pw-input" type="password" autocomplete="current-password" maxlength="40" placeholder="Пароль" required />
+          <button id="pw-eye-btn" tabindex="-1" type="button" class="hide" aria-label="Показати пароль">
+            <svg viewBox="0 0 24 24"><path d="M12 4.5C6.477 4.5 1.708 8.096.173 13.016c-.081.264-.081.551 0 .815C1.708 19.904 6.477 23.5 12 23.5s10.292-3.596 11.827-8.516c.081-.264.081-.551 0-.815C22.292 8.096 17.523 4.5 12 4.5zm0 16c-4.6 0-8.478-2.905-9.876-7C3.522 9.405 7.4 6.5 12 6.5s8.478 2.905 9.876 7c-1.398 4.095-5.276 7-9.876 7zm0-12a5 5 0 100 10 5 5 0 000-10zm0 8a3 3 0 110-6 3 3 0 010 6z"/></svg>
+          </button>
+        </label>
+        <div class="pw-btns">
+          <button type="submit">OK</button>
+          <button type="button" class="cancel-btn">Відміна</button>
+        </div>
+      </form>`;
+    document.body.appendChild(modalBg);
 
-      const input = document.getElementById('pw-input');
-      const error = document.getElementById('pw-error');
-      const eyeBtn = document.getElementById('pw-eye-btn');
-      let pwVisible = false;
-      eyeBtn.onclick = (e) => {
-        e.preventDefault();
-        pwVisible = !pwVisible;
-        input.type = pwVisible ? 'text' : 'password';
-        eyeBtn.classList.toggle('hide', !pwVisible);
-      };
+    const input = document.getElementById('pw-input');
+    const error = document.getElementById('pw-error');
+    const eyeBtn = document.getElementById('pw-eye-btn');
+    let pwVisible = false;
+    eyeBtn.onclick = (e) => {
+      e.preventDefault();
+      pwVisible = !pwVisible;
+      input.type = pwVisible ? 'text' : 'password';
+      eyeBtn.classList.toggle('hide', !pwVisible);
+    };
 
-      input.focus();
+    input.focus();
 
-      modalBg.querySelector('form').onsubmit = (e) => {
-        e.preventDefault();
-        const pass = input.value.trim();
-        let matched = PASSWORDS.find(p => p.value === pass);
-        if (matched) {
-          // Ставимо таймстемп тільки для цього пароля
-          let obj = localStorage.getItem('quiz_access');
-          obj = obj ? JSON.parse(obj) : {};
-          if (!obj[matched.key]) obj[matched.key] = Date.now();
-          localStorage.setItem('quiz_access', JSON.stringify(obj));
+    modalBg.querySelector('form').onsubmit = (e) => {
+      e.preventDefault();
+      const pass = input.value.trim();
+      let matched = PASSWORDS.find(p => p.value === pass);
+      let access = localStorage.getItem('quiz_access');
+      access = access ? JSON.parse(access) : {};
+      if (matched) {
+        // Сначала смотрим, не был ли пароль просрочен уже ранее
+        if (access[matched.key+'_expired']) {
+          error.textContent = 'Цей пароль вже не дійсний.';
+          return;
+        }
+        // Если метки времени нет — активируем
+        if (!access[matched.key]) {
+          access[matched.key] = Date.now();
+          localStorage.setItem('quiz_access', JSON.stringify(access));
           document.body.removeChild(modalBg);
           resolve(matched.key);
-        } else {
-          error.textContent = 'Невірний пароль!';
+          return;
         }
-      };
-      modalBg.querySelector('.cancel-btn').onclick = () => {
+        // Если метка есть — проверяем не истёк ли срок
+        if (isExpired(access[matched.key])) {
+          access[matched.key+'_expired'] = true;
+          delete access[matched.key];
+          localStorage.setItem('quiz_access', JSON.stringify(access));
+          error.textContent = 'Цей пароль вже не дійсний.';
+          return;
+        }
+        // В течение минуты — пускаем!
         document.body.removeChild(modalBg);
-        reject();
-      };
-    });
-  }
+        resolve(matched.key);
+      } else {
+        error.textContent = 'Невірний пароль!';
+      }
+    };
+    modalBg.querySelector('.cancel-btn').onclick = () => {
+      document.body.removeChild(modalBg);
+      reject();
+    };
+  });
+}
 
-  async function passwordCheck() {
-    clearExpiredPasswords();
-    let access = localStorage.getItem('quiz_access');
-    let usedKey = null, ok = false;
-    if (access) {
-      access = JSON.parse(access);
-      let now = Date.now();
-      for (let pass of PASSWORDS) {
-        let ts = access[pass.key];
-        if (ts && now - ts < VALID_MS) {
-          ok = true;
-          usedKey = pass.key;
-          break;
-        }
+async function passwordCheck() {
+  clearExpiredPasswords();
+  let access = localStorage.getItem('quiz_access');
+  let usedKey = null, ok = false;
+  if (access) {
+    access = JSON.parse(access);
+    let now = Date.now();
+    for (let pass of PASSWORDS) {
+      if (access[pass.key+'_expired']) continue;
+      let ts = access[pass.key];
+      if (ts && !isExpired(ts)) {
+        ok = true;
+        usedKey = pass.key;
+        break;
       }
     }
-    if (!ok) {
-      try {
-        usedKey = await showPwModal();
-        // Сразу очищаем просроченные после ввода!
-        clearExpiredPasswords();
-      } catch {
-        document.body.innerHTML = "";
-        throw "Canceled";
-      }
-    }
-    document.getElementById('main').classList.remove('hide');
   }
+  if (!ok) {
+    try {
+      usedKey = await showPwModal();
+      clearExpiredPasswords();
+    } catch {
+      document.body.innerHTML = "";
+      throw "Canceled";
+    }
+  }
+  document.getElementById('main').classList.remove('hide');
+}
 </script>
+
 <div id="main" class="hide">
   <div class="quiz-box" id="quiz-area">
     <div id="question"></div>
@@ -311,216 +370,212 @@
   <div id="three-counter"></div>
 </div>
 <script>
-passwordCheck().then(startQuiz);
+const questions = [
+  "Чому важливо сортувати сміття?",
+  "Навіщо економити воду вдома?",
+  "Що таке повторне використання речей?",
+  "Як зменшити забруднення повітря?",
+  "Чому треба саджати дерева?",
+  "Яка користь громадського транспорту для екології?",
+  "Чому важливо економити електроенергію?",
+  "Як пластикові відходи шкодять природі?",
+  "Що таке органічні продукти?",
+  "Як зменшити свій вуглецевий слід?",
+  "Що означає сталий споживчий підхід?",
+  "Чому важливо підтримувати біорізноманіття?",
+  "Як можна скоротити споживання пластику?",
+  "Навіщо використовувати багаторазові сумки?",
+  "Що таке компостування?",
+  "Як захищати рідкісні види тварин?",
+  "Чому важливо зберігати ліси?",
+  "Що таке відновлювана енергія?",
+  "Як впливають викиди CO2 на клімат?",
+  "Навіщо брати участь в екологічних акціях?"
+];
+const numRows = questions.length;
+let answers = Array(numRows).fill(null);
+let currentQuestion = 0;
+let tableScale = 1;
+const minScale = 0.1, maxScale = 1.5;
+let lastN = 1;
 
-function startQuiz() {
-  // ---- ВЕСЬ КОД КВІЗА ----
-  const questions = [
-    "Чому важливо сортувати сміття?",
-    "Навіщо економити воду вдома?",
-    "Що таке повторне використання речей?",
-    "Як зменшити забруднення повітря?",
-    "Чому треба саджати дерева?",
-    "Яка користь громадського транспорту для екології?",
-    "Чому важливо економити електроенергію?",
-    "Як пластикові відходи шкодять природі?",
-    "Що таке органічні продукти?",
-    "Як зменшити свій вуглецевий слід?",
-    "Що означає стале споживання?",
-    "Чому важливо підтримувати біорізноманіття?",
-    "Як можна скоротити споживання пластику?",
-    "Навіщо використовувати багаторазові сумки?",
-    "Що таке компостування?",
-    "Як захищати рідкісні види тварин?",
-    "Чому важливо зберігати ліси?",
-    "Що таке відновлювана енергія?",
-    "Як впливає викид CO2 на клімат?",
-    "Навіщо брати участь в екологічних акціях?"
-  ];
-  const numRows = questions.length;
-  let answers = Array(numRows).fill(null);
-  let currentQuestion = 0;
-  let tableScale = 1;
-  const minScale = 0.1, maxScale = 1.5;
-  let lastN = 1;
+function typeWriter(text, el, delay = 12, cb) {
+  el.innerHTML = '';
+  let i = 0;
+  el.classList.add('typewriter');
+  function typing() {
+    if (i < text.length) {
+      el.innerHTML += text[i] === '\n' ? '<br>' : text[i];
+      i++;
+      setTimeout(typing, delay);
+    } else {
+      el.classList.remove('typewriter');
+      if (cb) cb();
+    }
+  }
+  typing();
+}
 
-  function typeWriter(text, el, delay = 12, cb) {
-    el.innerHTML = '';
-    let i = 0;
-    el.classList.add('typewriter');
-    function typing() {
-      if (i < text.length) {
-        el.innerHTML += text[i] === '\n' ? '<br>' : text[i];
-        i++;
-        setTimeout(typing, delay);
+function showQuestion() {
+  if (currentQuestion < questions.length) {
+    document.getElementById('question').innerText = `Питання ${currentQuestion+1} з 20: ${questions[currentQuestion]}`;
+    document.getElementById('choices').style.opacity = 1;
+    document.getElementById('choices').innerHTML = `
+      <button class="btn red"    onclick="submitAnswer(0)">0</button>
+      <button class="btn yellow" onclick="submitAnswer(1)">1</button>
+      <button class="btn green"  onclick="submitAnswer(3)">3</button>
+    `;
+  } else {
+    document.getElementById('quiz-area').style.display = 'none';
+  }
+  updateTable(true);
+}
+
+function submitAnswer(val) {
+  document.getElementById('choices').style.opacity = 0;
+  answers[currentQuestion] = val;
+  setTimeout(() => {
+    currentQuestion++;
+    showQuestion();
+    updateCounter();
+  }, 180);
+}
+
+function getSum() {
+  return answers.reduce((a, b) => a + (b !== null ? b : 0), 0);
+}
+function getSumColor(sum) {
+  if (sum >= 17 && sum < 18) return 'color-orange';
+  if (sum >= 18 && sum < 25) return 'color-yellow';
+  if (sum >= 25 && sum <= 30) return 'color-green';
+  return 'empty';
+}
+function getSumColumn(sum) {
+  if (sum >= 17 && sum < 18) return 0; // Orange
+  if (sum >= 18 && sum < 25) return 1; // Yellow
+  if (sum >= 25 && sum <= 30) return 2; // Green
+  return -1;
+}
+
+function updateTable(withAnimation = false) {
+  const N = Math.max(1, currentQuestion);
+  let thFont = N > 9 ? "0.92em" : (N > 6 ? "0.99em" : "1.06em");
+  let html = `<div class="scalable-table" id="scalableTable" style="font-size: ${tableScale}em;">`;
+  html += `<table><tr><th class="row-num"></th>`;
+  for (let q = 0; q < N; q++) {
+    let anim = (withAnimation && N > lastN && q === N-1) ? "new-cell" : "";
+    html += `<th class="${anim}" style="font-size:${thFont}"><span id="header-q-${q}"></span></th>`;
+  }
+  html += `<th class="sum-col">Сума</th>`;
+  html += `<th class="color-sect"><div class="color-orange">17–18</div></th>`;
+  html += `<th class="color-sect"><div class="color-yellow">18–25</div></th>`;
+  html += `<th class="color-sect"><div class="color-green">25–30</div></th>`;
+  html += '</tr>';
+  // Сума (завжди зверху)
+  let sum = getSum();
+  let colorClass = getSumColor(sum);
+  let sumCol = getSumColumn(sum);
+  html += '<tr class="sum-row">';
+  html += '<td></td>';
+  for (let c = 0; c < N; c++) html += '<td></td>';
+  html += `<td class="sum-live">${sum}</td>`;
+  for (let i = 0; i < 3; i++) {
+    html += (i === sumCol && currentQuestion >= numRows)
+      ? `<td class="sum-final ${colorClass}">${sum}</td>`
+      : `<td class="sum-final empty"></td>`;
+  }
+  html += '</tr>';
+  // Рядки-відповіді: кожен рядок лише для вже наданих відповідей!
+  for (let r = 0; r < N; r++) {
+    let rowAnim = (withAnimation && N > lastN && r === N-1) ? "new-cell" : "";
+    html += `<tr><td class="row-num ${rowAnim}">${r+1}</td>`;
+    for (let c = 0; c < N; c++) {
+      let anim = (withAnimation && N > lastN && (c === N-1 || r === N-1)) ? "new-cell" : "";
+      if (r === c) {
+        html += (answers[r] === null)
+          ? `<td class="dark-cell ${anim}"></td>`
+          : `<td class="${anim}">${answers[r]}</td>`;
       } else {
-        el.classList.remove('typewriter');
-        if (cb) cb();
+        html += `<td class="dark-cell ${anim}"></td>`;
       }
     }
-    typing();
+    html += `<td class="sum-col"></td><td></td><td></td><td></td></tr>`;
   }
-
-  window.showQuestion = function() {
-    if (currentQuestion < questions.length) {
-      document.getElementById('question').innerText = `Питання ${currentQuestion+1} з 20: ${questions[currentQuestion]}`;
-      document.getElementById('choices').style.opacity = 1;
-      document.getElementById('choices').innerHTML = `
-        <button class="btn red"    onclick="submitAnswer(0)">0</button>
-        <button class="btn yellow" onclick="submitAnswer(1)">1</button>
-        <button class="btn green"  onclick="submitAnswer(3)">3</button>
-      `;
-    } else {
-      document.getElementById('quiz-area').style.display = 'none';
-    }
-    updateTable(true);
-  }
-
-  window.submitAnswer = function(val) {
-    document.getElementById('choices').style.opacity = 0;
-    answers[currentQuestion] = val;
+  html += '</table></div>';
+  document.getElementById('excel-table').innerHTML = html;
+  if (withAnimation && N > lastN) {
     setTimeout(() => {
-      currentQuestion++;
-      showQuestion();
-      updateCounter();
-    }, 180);
-  }
-
-  function getSum() {
-    return answers.reduce((a, b) => a + (b !== null ? b : 0), 0);
-  }
-  function getSumColor(sum) {
-    if (sum >= 17 && sum < 18) return 'color-orange';
-    if (sum >= 18 && sum < 25) return 'color-yellow';
-    if (sum >= 25 && sum <= 30) return 'color-green';
-    return 'empty';
-  }
-  function getSumColumn(sum) {
-    if (sum >= 17 && sum < 18) return 0; // Orange
-    if (sum >= 18 && sum < 25) return 1; // Yellow
-    if (sum >= 25 && sum <= 30) return 2; // Green
-    return -1;
-  }
-
-  window.updateTable = function(withAnimation = false) {
-    const N = Math.max(1, currentQuestion);
-    let thFont = N > 9 ? "0.92em" : (N > 6 ? "0.99em" : "1.06em");
-    let html = `<div class="scalable-table" id="scalableTable" style="font-size: ${tableScale}em;">`;
-    html += `<table><tr><th class="row-num"></th>`;
-    for (let q = 0; q < N; q++) {
-      let anim = (withAnimation && N > lastN && q === N-1) ? "new-cell" : "";
-      html += `<th class="${anim}" style="font-size:${thFont}"><span id="header-q-${q}"></span></th>`;
-    }
-    html += `<th class="sum-col">Сума</th>`;
-    html += `<th class="color-sect"><div class="color-orange">17–18</div></th>`;
-    html += `<th class="color-sect"><div class="color-yellow">18–25</div></th>`;
-    html += `<th class="color-sect"><div class="color-green">25–30</div></th>`;
-    html += '</tr>';
-    // Сумма (всегда сверху)
-    let sum = getSum();
-    let colorClass = getSumColor(sum);
-    let sumCol = getSumColumn(sum);
-    html += '<tr class="sum-row">';
-    html += '<td></td>';
-    for (let c = 0; c < N; c++) html += '<td></td>';
-    html += `<td class="sum-live">${sum}</td>`;
-    for (let i = 0; i < 3; i++) {
-      html += (i === sumCol && currentQuestion >= numRows)
-        ? `<td class="sum-final ${colorClass}">${sum}</td>`
-        : `<td class="sum-final empty"></td>`;
-    }
-    html += '</tr>';
-    // Строки-ответы: только для уже отвеченных!
-    for (let r = 0; r < N; r++) {
-      let rowAnim = (withAnimation && N > lastN && r === N-1) ? "new-cell" : "";
-      html += `<tr><td class="row-num ${rowAnim}">${r+1}</td>`;
-      for (let c = 0; c < N; c++) {
-        let anim = (withAnimation && N > lastN && (c === N-1 || r === N-1)) ? "new-cell" : "";
-        if (r === c) {
-          html += (answers[r] === null)
-            ? `<td class="dark-cell ${anim}"></td>`
-            : `<td class="${anim}">${answers[r]}</td>`;
-        } else {
-          html += `<td class="dark-cell ${anim}"></td>`;
-        }
+      let cell = document.getElementById(`header-q-${N-1}`);
+      if (cell && cell.innerHTML.trim() === '') {
+        typeWriter(questions[N-1], cell, 12);
       }
-      html += `<td class="sum-col"></td><td></td><td></td><td></td></tr>`;
-    }
-    html += '</table></div>';
-    document.getElementById('excel-table').innerHTML = html;
-    if (withAnimation && N > lastN) {
-      setTimeout(() => {
-        let cell = document.getElementById(`header-q-${N-1}`);
-        if (cell && cell.innerHTML.trim() === '') {
-          typeWriter(questions[N-1], cell, 12);
-        }
-      }, 90);
-    } else {
-      for (let i = 0; i < N; i++) {
-        let cell = document.getElementById(`header-q-${i}`);
-        if (cell) cell.innerHTML = questions[i];
-      }
-    }
-    lastN = N;
-  }
-
-  window.updateCounter = function() {
-    let count3 = answers.filter(x => x === 3).length;
-    document.getElementById('three-counter').innerHTML =
-      `<div class="counter-box">Всього “3” вибрано: ${count3}</div>`;
-  }
-
-  // Кнопки +/−: меняют масштаб
-  window.resizeTable = function(delta) {
-    tableScale += delta * 0.09;
-    if (tableScale < minScale) tableScale = minScale;
-    if (tableScale > maxScale) tableScale = maxScale;
-    updateTable(false);
-  };
-
-  // Ресайзеры области
-  const tableWrap = document.getElementById('tableWrap');
-  let isResizing = false, resizeDir = "", startX = 0, startY = 0, startW = 0, startH = 0;
-
-  function startResize(e, dir) {
-    isResizing = true;
-    resizeDir = dir;
-    startX = e.clientX; startY = e.clientY;
-    startW = tableWrap.offsetWidth;
-    startH = tableWrap.offsetHeight;
-    document.body.style.userSelect = "none";
-    e.target.classList.add('active');
-  }
-  function doResize(e) {
-    if (!isResizing) return;
-    let dx = e.clientX - startX;
-    let dy = e.clientY - startY;
-    if (resizeDir === "both") {
-      tableWrap.style.width = Math.max(140, startW + dx) + "px";
-      tableWrap.style.height = Math.max(60, startH + dy) + "px";
-    }
-    if (resizeDir === "horiz") {
-      tableWrap.style.width = Math.max(140, startW + dx) + "px";
-    }
-    if (resizeDir === "vert") {
-      tableWrap.style.height = Math.max(60, startH + dy) + "px";
+    }, 90);
+  } else {
+    for (let i = 0; i < N; i++) {
+      let cell = document.getElementById(`header-q-${i}`);
+      if (cell) cell.innerHTML = questions[i];
     }
   }
-  function stopResize(e) {
-    isResizing = false;
-    document.body.style.userSelect = "";
-    document.querySelectorAll('.resize-rect').forEach(el=>el.classList.remove('active'));
-  }
-  document.getElementById('resizeBR').addEventListener("mousedown", e => startResize(e, "both"));
-  document.getElementById('resizeR').addEventListener("mousedown", e => startResize(e, "horiz"));
-  document.getElementById('resizeB').addEventListener("mousedown", e => startResize(e, "vert"));
-  window.addEventListener("mousemove", doResize);
-  window.addEventListener("mouseup", stopResize);
+  lastN = N;
+}
 
-  // Запуск
+function updateCounter() {
+  let count3 = answers.filter(x => x === 3).length;
+  document.getElementById('three-counter').innerHTML =
+    `<div class="counter-box">Всього “3” обрано: ${count3}</div>`;
+}
+
+// Кнопки +/−: змінюють масштаб контенту (шрифт/відступи)
+function resizeTable(delta) {
+  tableScale += delta * 0.09;
+  if (tableScale < minScale) tableScale = minScale;
+  if (tableScale > maxScale) tableScale = maxScale;
+  updateTable(false);
+}
+
+// Ресайзери області
+const tableWrap = document.getElementById('tableWrap');
+let isResizing = false, resizeDir = "", startX = 0, startY = 0, startW = 0, startH = 0;
+
+function startResize(e, dir) {
+  isResizing = true;
+  resizeDir = dir;
+  startX = e.clientX; startY = e.clientY;
+  startW = tableWrap.offsetWidth;
+  startH = tableWrap.offsetHeight;
+  document.body.style.userSelect = "none";
+  e.target.classList.add('active');
+}
+function doResize(e) {
+  if (!isResizing) return;
+  let dx = e.clientX - startX;
+  let dy = e.clientY - startY;
+  if (resizeDir === "both") {
+    tableWrap.style.width = Math.max(140, startW + dx) + "px";
+    tableWrap.style.height = Math.max(60, startH + dy) + "px";
+  }
+  if (resizeDir === "horiz") {
+    tableWrap.style.width = Math.max(140, startW + dx) + "px";
+  }
+  if (resizeDir === "vert") {
+    tableWrap.style.height = Math.max(60, startH + dy) + "px";
+  }
+}
+function stopResize(e) {
+  isResizing = false;
+  document.body.style.userSelect = "";
+  document.querySelectorAll('.resize-rect').forEach(el=>el.classList.remove('active'));
+}
+document.getElementById('resizeBR').addEventListener("mousedown", e => startResize(e, "both"));
+document.getElementById('resizeR').addEventListener("mousedown", e => startResize(e, "horiz"));
+document.getElementById('resizeB').addEventListener("mousedown", e => startResize(e, "vert"));
+window.addEventListener("mousemove", doResize);
+window.addEventListener("mouseup", stopResize);
+
+passwordCheck().then(() => {
   showQuestion();
   updateCounter();
-}
+});
 </script>
 </body>
 </html>
